@@ -1,4 +1,4 @@
-import type { DataScope } from '@/enums/permission'
+import { DataScope } from '@/enums/permission'
 
 /** 超级管理员通配标识（单星号 / RuoYi 风格三段星号均视为超管） */
 const SUPER_WILDCARDS = new Set(['*', '*:*:*'])

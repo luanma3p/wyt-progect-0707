@@ -1,5 +1,5 @@
 /* eslint-env node */
-require('@rush-stack/eslint-patch/modern-module-resolution')
+require('@rushstack/eslint-patch/modern-module-resolution')
 
 module.exports = {
   root: true,
@@ -39,6 +39,8 @@ module.exports = {
     'node_modules/**',
     '*.config.js',
     '*.config.cjs',
+    '.eslintrc.cjs',
+    '.prettierrc.cjs',
     'public/**',
     'src/auto-imports.d.ts',
     'src/components.d.ts',

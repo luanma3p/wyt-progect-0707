@@ -2,7 +2,7 @@ import type { App } from 'vue'
 import { setupElementPlus } from './element-plus'
 import { setupIcons } from './icons'
 import { setupDirectives } from '@/directives'
-import { setupGlobalComponents } from '@/components'
+import { setupGlobalComponents } from '@/components/index'
 
 /** 统一插件注册入口 */
 export function setupPlugins(app: App) {

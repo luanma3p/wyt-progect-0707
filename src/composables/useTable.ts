@@ -27,7 +27,7 @@ export function useTable<T, Q extends PageQuery = PageQuery>(
     pageNum: 1,
     pageSize: options.defaultPageSize ?? 10,
   })
-  const query = reactive<Partial<Q>>({ ...(options.defaultQuery ?? {}) })
+  const query = reactive({ ...(options.defaultQuery ?? {}) }) as Partial<Q>
 
   async function loadData() {
     loading.value = true

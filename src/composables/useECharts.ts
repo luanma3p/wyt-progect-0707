@@ -1,6 +1,5 @@
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch, type Ref } from 'vue'
 import * as echarts from 'echarts/core'
-import type { EChartsOption, ECharts } from 'echarts'
 import { useResizeObserver } from '@vueuse/core'
 
 /**
@@ -9,18 +8,20 @@ import { useResizeObserver } from '@vueuse/core'
  */
 export function useECharts(
   el: Ref<HTMLElement | undefined>,
-  option: Ref<EChartsOption>,
+  option: Ref<Record<string, unknown>>,
   opts: { theme?: string } = {},
 ) {
-  const chart = shallowRef<ECharts>()
+  const chart = shallowRef<ReturnType<typeof echarts.init> | undefined>()
   const loading = ref(false)
 
   function render() {
     if (!el.value) return
-    if (!chart.value) {
-      chart.value = echarts.init(el.value, opts.theme)
+    let instance = chart.value
+    if (!instance) {
+      instance = echarts.init(el.value, opts.theme)
+      chart.value = instance
     }
-    chart.value.setOption(option.value, true)
+    instance.setOption(option.value, true)
   }
 
   function resize() {

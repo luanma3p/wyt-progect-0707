@@ -9,8 +9,8 @@ interface Props {
 }
 const props = defineProps<Props>()
 const { getLabel, getTagType } = useDict(props.code)
-const label = computed(() => getLabel(props.value))
-const tagType = computed(() => getTagType(props.value))
+const label = computed(() => getLabel(props.code, props.value))
+const tagType = computed(() => getTagType(props.code, props.value))
 </script>
 
 <template>

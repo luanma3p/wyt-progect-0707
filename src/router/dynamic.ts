@@ -25,7 +25,11 @@ export function buildRoutesFromMenus(menus: MenuRoute[], options: BuildOptions):
   return routes
 }
 
-function buildRoute(menu: MenuRoute, options: BuildOptions, isTopLevel: boolean): AppRouteRecord | null {
+function buildRoute(
+  menu: MenuRoute,
+  options: BuildOptions,
+  isTopLevel: boolean,
+): AppRouteRecord | null {
   if (menu.type === 'button') return null
   if (!hasMenuAccess(menu, options)) return null
 
@@ -38,11 +42,9 @@ function buildRoute(menu: MenuRoute, options: BuildOptions, isTopLevel: boolean)
   }
 
   const hasChildren = children.length > 0
-  const component = isTopLevel
-    ? LAYOUT
-    : resolveComponent(menu.component)
+  const component = isTopLevel ? LAYOUT : resolveComponent(menu.component)
 
-  const route: AppRouteRecord = {
+  const route = {
     path: normalizePath(menu.path, isTopLevel),
     name: menu.name,
     component: component ?? LAYOUT,
@@ -60,7 +62,7 @@ function buildRoute(menu: MenuRoute, options: BuildOptions, isTopLevel: boolean)
       alwaysShow: menu.alwaysShow,
       order: menu.order,
     },
-  }
+  } as AppRouteRecord
 
   if (hasChildren) {
     route.children = children

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { teacherService } from '@/service/teacher.service'
 import type { TeacherDetailResp } from '@/service/teacher.service'
-import { TeacherStatus } from '@/enums/business'
 
 defineOptions({ name: 'TeacherDetail' })
 
@@ -11,7 +10,10 @@ const router = useRouter()
 const loading = ref(false)
 const detail = ref<TeacherDetailResp | null>(null)
 
-const statusMapping: Record<string, { text: string; type: 'success' | 'warning' | 'danger' | 'info' | 'primary' }> = {
+const statusMapping: Record<
+  string,
+  { text: string; type: 'success' | 'warning' | 'danger' | 'info' | 'primary' }
+> = {
   pending: { text: '待审核', type: 'warning' },
   approved: { text: '已通过', type: 'success' },
   rejected: { text: '已驳回', type: 'danger' },
@@ -34,11 +36,11 @@ onMounted(loadDetail)
 <template>
   <BasePage title="教师详情">
     <div v-loading="loading">
-      <el-button :icon="undefined" plain @click="router.back()" style="margin-bottom: 16px">
+      <el-button :icon="undefined" plain style="margin-bottom: 16px" @click="router.back()">
         返回
       </el-button>
 
-      <el-card shadow="never" v-if="detail">
+      <el-card v-if="detail" shadow="never">
         <template #header>基本信息</template>
         <el-descriptions :column="3" border>
           <el-descriptions-item label="姓名">{{ detail.name }}</el-descriptions-item>
@@ -54,11 +56,13 @@ onMounted(loadDetail)
           <el-descriptions-item label="状态">
             <StatusBadge :status="detail.status" :mapping="statusMapping" />
           </el-descriptions-item>
-          <el-descriptions-item label="简介" :span="3">{{ detail.intro || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="简介" :span="3">
+            {{ detail.intro || '-' }}
+          </el-descriptions-item>
         </el-descriptions>
       </el-card>
 
-      <el-card shadow="never" class="section-card" v-if="detail">
+      <el-card v-if="detail" shadow="never" class="section-card">
         <template #header>资质信息</template>
         <el-table :data="detail.qualifications" stripe>
           <el-table-column prop="name" label="资质名称" />
@@ -74,7 +78,7 @@ onMounted(loadDetail)
         </el-table>
       </el-card>
 
-      <el-card shadow="never" class="section-card" v-if="detail">
+      <el-card v-if="detail" shadow="never" class="section-card">
         <template #header>跟进记录</template>
         <el-timeline v-if="detail.followRecords?.length">
           <el-timeline-item

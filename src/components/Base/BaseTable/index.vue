@@ -32,9 +32,7 @@ const emit = defineEmits<{
 }>()
 
 // 收集字典编码，统一加载一次
-const dictCodes = computed(() =>
-  props.columns.map((c) => c.dict).filter((d): d is string => !!d),
-)
+const dictCodes = computed(() => props.columns.map((c) => c.dict).filter((d): d is string => !!d))
 const uniqueDictCodes = computed(() => [...new Set(dictCodes.value)])
 const { getLabel, getTagType } = useDict(...uniqueDictCodes.value)
 
@@ -117,7 +115,7 @@ function onSelectionChange(rows: T[]) {
       :width="160"
     >
       <template #default="{ row }">
-        <template v-for="(action, i) in visibleActions(row)" :key="i">
+        <template v-for="action in visibleActions(row)" :key="action.label">
           <ElButton
             :type="action.danger ? 'danger' : 'primary'"
             :disabled="action.disabled?.(row)"

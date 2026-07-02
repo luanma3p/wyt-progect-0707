@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { API_PREFIX, ok, fail, students, studentFollows } from '../db'
+import { API_PREFIX, ok, students, studentFollows } from '../db'
 
 export const studentHandlers = [
   http.get(`${API_PREFIX}/student/list`, ({ request }) => {

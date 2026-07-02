@@ -30,12 +30,14 @@ export function useDict(...codes: string[]) {
     )
   }
 
-  function getLabel(code: string, value: string | number): string {
+  function getLabel(code: string, value: string | number | undefined | null): string {
+    if (value == null) return ''
     const item = dictMap[code]?.find((i) => i.value === value)
     return item?.label ?? String(value)
   }
 
-  function getTagType(code: string, value: string | number) {
+  function getTagType(code: string, value: string | number | undefined | null) {
+    if (value == null) return ''
     return dictMap[code]?.find((i) => i.value === value)?.tagType ?? ''
   }
 

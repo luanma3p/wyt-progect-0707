@@ -70,7 +70,7 @@ export const useAppStore = defineStore(
   {
     persist: {
       key: 'BANXUE_APP',
-      pick: ['sidebarCollapsed', 'theme', 'size', 'language'],
+      paths: ['sidebarCollapsed', 'theme', 'size', 'language'],
     },
   },
 )

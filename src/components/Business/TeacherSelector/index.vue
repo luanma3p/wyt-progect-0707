@@ -9,7 +9,7 @@ interface Props {
   disabled?: boolean
   clearable?: boolean
 }
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   placeholder: '请选择教师',
   clearable: true,
 })
@@ -32,7 +32,10 @@ async function remoteSearch(query: string) {
 
 function handleChange(val: string | number | undefined) {
   emit('update:modelValue', val)
-  emit('change', options.value.find((t) => t.id === val))
+  emit(
+    'change',
+    options.value.find((t) => t.id === val),
+  )
 }
 </script>
 

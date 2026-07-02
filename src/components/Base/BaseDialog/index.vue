@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElDialog } from 'element-plus'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     visible: boolean
     title?: string

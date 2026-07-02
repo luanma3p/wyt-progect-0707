@@ -24,13 +24,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "mocks/**/*.ts",
-    "vite.config.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "mocks/**/*.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

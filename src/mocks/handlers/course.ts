@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
-import { API_PREFIX, ok, fail, courses, schedules } from '../db'
+import { API_PREFIX, ok, courses, schedules } from '../db'
 import type { CourseForm } from '@/api/types/course'
+import { CourseStatus } from '@/enums/business'
 
 export const courseHandlers = [
   http.get(`${API_PREFIX}/course/list`, ({ request }) => {
@@ -30,7 +31,7 @@ export const courseHandlers = [
       teacherId: body.teacherId,
       totalHours: body.totalHours,
       price: body.price,
-      status: 'draft',
+      status: CourseStatus.DRAFT,
       studentCount: 0,
     })
     return HttpResponse.json(ok(null, '课程已创建'))

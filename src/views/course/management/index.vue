@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import BaseForm from '@/components/Base/BaseForm/index.vue'
 import type { FormField } from '@/components/Base/BaseForm/types'
 import type { TableColumn } from '@/components/Base/BaseTable/types'
@@ -43,17 +43,30 @@ const searchFields: FormField[] = [
   },
 ]
 
-const statusMapping: Record<string, { text: string; type: 'success' | 'warning' | 'danger' | 'info' | 'primary' }> = {
+const statusMapping: Record<
+  string,
+  { text: string; type: 'success' | 'warning' | 'danger' | 'info' | 'primary' }
+> = {
   draft: { text: '草稿', type: 'info' },
   published: { text: '已发布', type: 'success' },
   offline: { text: '已下架', type: 'warning' },
 }
 
 const columns: TableColumn<CourseListItem>[] = [
-  { prop: 'name', label: '课程名称', minWidth: 180, actions: [
-    { label: '编辑', onClick: (row) => openDialog('edit', row) },
-    { label: '删除', danger: true, confirm: '确认删除该课程？', onClick: (row) => handleDelete(row) },
-  ] },
+  {
+    prop: 'name',
+    label: '课程名称',
+    minWidth: 180,
+    actions: [
+      { label: '编辑', onClick: (row) => openDialog('edit', row) },
+      {
+        label: '删除',
+        danger: true,
+        confirm: '确认删除该课程？',
+        onClick: (row) => handleDelete(row),
+      },
+    ],
+  },
   { prop: 'subject', label: '学科', width: 90 },
   { prop: 'grade', label: '年级', width: 90 },
   { prop: 'teacherName', label: '授课教师', width: 110 },
@@ -73,7 +86,13 @@ const formFields = computed<FormField[]>(() => [
   { prop: 'name', label: '课程名称', type: 'input', required: true },
   { prop: 'subject', label: '学科', type: 'select', required: true, options: subjectOptions },
   { prop: 'grade', label: '年级', type: 'select', required: true, options: gradeOptions },
-  { prop: 'teacherId', label: '授课教师', type: 'select', required: true, options: teacherOptions.value },
+  {
+    prop: 'teacherId',
+    label: '授课教师',
+    type: 'select',
+    required: true,
+    options: teacherOptions.value,
+  },
   { prop: 'totalHours', label: '总课时', type: 'number', required: true },
   { prop: 'price', label: '价格', type: 'number', required: true },
   { prop: 'intro', label: '简介', type: 'textarea', span: 24 },

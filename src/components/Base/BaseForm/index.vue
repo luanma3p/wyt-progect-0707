@@ -21,7 +21,7 @@ import type { FormField } from './types'
 const props = withDefaults(
   defineProps<{
     fields: FormField[]
-    modelValue: Record<string, unknown>
+    modelValue: Record<string, any>
     labelWidth?: string
     labelPosition?: 'left' | 'right' | 'top'
     inline?: boolean
@@ -36,7 +36,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Record<string, unknown>): void
+  (e: 'update:modelValue', value: Record<string, any>): void
 }>()
 
 const elFormRef = ref<FormInstance>()

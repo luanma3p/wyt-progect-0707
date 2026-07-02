@@ -8,7 +8,6 @@ import {
   TitleComponent,
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
-import type { EChartsOption } from 'echarts'
 import { dashboardApi } from '@/api/dashboard'
 import type { DashboardOverviewResp } from '@/api/types/dashboard'
 import { useECharts } from '@/composables/useECharts'
@@ -31,13 +30,16 @@ const loading = ref(false)
 const lineEl = ref<HTMLElement>()
 const pieEl = ref<HTMLElement>()
 
-const lineOption = ref<EChartsOption>({})
-const pieOption = ref<EChartsOption>({})
+const lineOption = ref<Record<string, unknown>>({})
+const pieOption = ref<Record<string, unknown>>({})
 
 useECharts(lineEl, lineOption)
 useECharts(pieEl, pieOption)
 
-const auditStatusMapping: Record<string, { text: string; type: 'success' | 'danger' | 'info' | 'warning' | 'primary' }> = {
+const auditStatusMapping: Record<
+  string,
+  { text: string; type: 'success' | 'danger' | 'info' | 'warning' | 'primary' }
+> = {
   approved: { text: '通过', type: 'success' },
   rejected: { text: '驳回', type: 'danger' },
   pending: { text: '待审核', type: 'warning' },
@@ -103,7 +105,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <BasePage title="数据看板" v-loading="loading">
+  <BasePage v-loading="loading" title="数据看板">
     <el-row :gutter="16" class="stat-row">
       <el-col v-for="card in statCards" :key="card.label" :span="6">
         <el-card shadow="hover" class="stat-card">
