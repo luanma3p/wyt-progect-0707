@@ -1,0 +1,59 @@
+@use './mixins.scss' as *;
+@use './reset.scss';
+@use './element-overrides.scss';
+
+// 通用工具类
+.text-primary {
+  color: $color-primary;
+}
+.text-success {
+  color: $color-success;
+}
+.text-warning {
+  color: $color-warning;
+}
+.text-danger {
+  color: $color-danger;
+}
+.text-info {
+  color: $color-info;
+}
+
+.flex {
+  display: flex;
+}
+.flex-center {
+  @include flex-center;
+}
+.flex-between {
+  @include flex-between;
+}
+.flex-1 {
+  flex: 1;
+}
+.mt-sm {
+  margin-top: $spacing-sm;
+}
+.mt-md {
+  margin-top: $spacing-md;
+}
+.mt-lg {
+  margin-top: $spacing-lg;
+}
+.mb-sm {
+  margin-bottom: $spacing-sm;
+}
+.mb-md {
+  margin-bottom: $spacing-md;
+}
+.mb-lg {
+  margin-bottom: $spacing-lg;
+}
+
+// NProgress 颜色
+#nprogress .bar {
+  background: $color-primary !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px $color-primary, 0 0 5px $color-primary !important;
+}
