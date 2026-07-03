@@ -9,9 +9,7 @@ const props = withDefaults(defineProps<Props>(), {
   basePath: '',
 })
 
-const visibleChildren = computed(
-  () => (props.item.children ?? []).filter((c) => !c.meta?.hidden),
-)
+const visibleChildren = computed(() => (props.item.children ?? []).filter((c) => !c.meta?.hidden))
 
 /** 单可见子菜单且非 alwaysShow：直接渲染该子菜单为叶子节点（减少层级） */
 const showingChild = computed(() => {
@@ -22,10 +20,14 @@ const showingChild = computed(() => {
 })
 
 function resolvePath(routePath: string): string {
+  return resolvePathWithBase(routePath, props.basePath)
+}
+
+function resolvePathWithBase(routePath: string, basePath: string): string {
   if (!routePath) return ''
   if (routePath.startsWith('http')) return routePath
   if (routePath.startsWith('/')) return routePath
-  return `${props.basePath}/${routePath}`.replace(/\/+/g, '/')
+  return `${basePath}/${routePath}`.replace(/\/+/g, '/')
 }
 </script>
 
@@ -33,7 +35,7 @@ function resolvePath(routePath: string): string {
   <!-- 单子菜单：直接渲染为 menu-item -->
   <el-menu-item
     v-if="showingChild && !showingChild.children?.length"
-    :index="resolvePath(showingChild.path)"
+    :index="resolvePathWithBase(showingChild.path, resolvePath(item.path))"
   >
     <el-icon v-if="showingChild.meta?.icon">
       <BaseIcon :name="String(showingChild.meta.icon)" />

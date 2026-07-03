@@ -1,20 +1,22 @@
-# 伴学老师后台管理系统 - 收尾实施计划（G4 → H → I）
+# 伴学老师后台管理系统 - 收尾实施计划（0 → G4 → H → I）
 
 > 本计划是 9 阶段（A-I）脚手架工程的最后一轮收尾。阶段 A-F0-F 已在前序完成，
 > 阶段 G（业务视图 + service）已完成 4/5 视图 + 3 service，仅剩 `course/schedule`。
-> 本轮目标：补齐最后 1 个视图 → 编写文档 → 验证收尾，使项目「可编译、可构建、可运行、可维护」。
+> 本轮目标：修复依赖安装阻塞 → 补齐最后 1 个视图 → 编写文档 → 验证收尾，使项目「可编译、可构建、可运行、可维护」。
 
 ## 一、Summary 概要
 
-| 阶段 | 内容 | 产物 |
-|------|------|------|
-| G4 | 排课管理视图 | `src/views/course/schedule/index.vue` |
-| H | 项目文档 | `README.md` + `docs/{architecture,conventions,permission,decision-log}.md` |
-| I | 验证收尾 | type-check / build / lint:check 通过 |
+| 阶段 | 内容             | 产物                                                                       |
+| ---- | ---------------- | -------------------------------------------------------------------------- |
+| 0    | 修复依赖安装阻塞 | `package.json` + `.eslintrc.cjs` 包名修正                                  |
+| G4   | 排课管理视图     | `src/views/course/schedule/index.vue`                                      |
+| H    | 项目文档         | `README.md` + `docs/{architecture,conventions,permission,decision-log}.md` |
+| I    | 验证收尾         | npm install / type-check / build / lint:check 通过                         |
 
 ## 二、Current State Analysis 现状分析（基于 Phase 1 探索）
 
 ### 已完成（经 Glob / Read 确认）
+
 - **视图（10/11）**：login、error/404、error/403、redirect、profile、dashboard、teacher/list、teacher/detail、student/list、course/management
 - **service（3/3）**：teacher.service.ts、student.service.ts、course.service.ts
 - **基础组件**：BasePage / BaseTable / BaseForm / BaseDialog / BaseSearch / BasePagination / BaseButton / BaseIcon / BaseEmpty
@@ -26,11 +28,13 @@
 - **mocks**：db.ts（含 schedules 数据，日期 2026-07-02、2026-07-03）
 
 ### 已确认无需处理
+
 - `src/api/modules/` 空目录已不存在（Glob 返回空），无需清理
 - README.md 当前为占位内容（仅 `prompt`），需重写
 - `docs/` 目录不存在，需新建
 
 ### 关键依赖确认（影响 G4 实现）
+
 - `courseApi.getSchedule(params: { startDate; endDate })` 返回 `ScheduleItem[]`（**非分页**）
 - `courseService.fetchSchedule` 直接透传上述方法
 - `ScheduleItem` 字段：id / courseId / courseName / teacherName / teacherId / studentName / studentId / date / startTime / endTime / classroom / status
@@ -39,30 +43,48 @@
 
 ## 三、Proposed Changes 拟定变更
 
+### 阶段 0：修复依赖安装阻塞（阻塞性前置）
+
+**问题**：`npm install` 报 E404，`@rush-stack/eslint-patch@^1.10.4 is not in this registry`。
+
+**根因**：包名拼写错误。npm registry 上的真实包名是 `@rushstack/eslint-patch`（**无连字符**，`rushstack` 连写，最新版 1.16.1），而项目里误写为 `@rush-stack/eslint-patch`（带连字符），导致 404。已通过 npmjs.com / jsdelivr 联网核实。
+
+**变更**：
+
+1. `package.json` devDependencies：
+   - `"@rush-stack/eslint-patch": "^1.10.4"` → `"@rushstack/eslint-patch": "^1.16.1"` -（修正包名 + 升至当前最新版，`^1.16.1` 语义安全）
+2. `.eslintrc.cjs` 第 2 行：
+   - `require('@rush-stack/eslint-patch/modern-module-resolution')` → `require('@rushstack/eslint-patch/modern-module-resolution')`
+3. 修正后执行 `npm install`（生成 `node_modules/` + `package-lock.json`），为后续所有验证解锁前置条件
+
+**风险评估**：低。包名修正属于拼写纠错，`modern-module-resolution` 子路径在真实包中存在；版本升至 1.16.1 向后兼容（同为 1.x，仅 ESLint 兼容性增强）。
+
 ### 阶段 G4：排课管理视图
 
 **文件**：`src/views/course/schedule/index.vue`（NEW）
 
 **设计要点**：
+
 - **结构**：`BasePage` + 日期范围选择器（`el-date-picker type="daterange"`）+ `BaseTable`（只读列表，无 actions）
 - **数据源**：`courseService.fetchSchedule({ startDate, endDate })`，返回 `ScheduleItem[]`（非分页，故不用 `useTable` / `BasePagination`）
 - **默认日期范围**：本周（周一 ~ 周日）。今天为 2026-07-02（周四），本周即 2026-06-29 ~ 2026-07-05，可覆盖 mock 数据日期 07-02/07-03
 - **日期处理**：用 `dayjs`（已装依赖）计算本周起止，格式 `YYYY-MM-DD`
 - **列定义**（`TableColumn<ScheduleItem>`，无 actions）：
-  | prop | label | width | 渲染 |
-  |------|-------|-------|------|
-  | date | 日期 | 120 | 直接显示 |
-  | — | 时间 | 140 | formatter 拼接 `startTime ~ endTime` |
-  | courseName | 课程 | — (minWidth 180) | 直接显示 |
-  | teacherName | 教师 | 110 | 直接显示 |
-  | studentName | 学员 | 110 | 直接显示 |
-  | classroom | 教室 | 100 | 直接显示 |
-  | status | 状态 | 100 | slot + StatusBadge |
+  | prop        | label | width            | 渲染                                 |
+  | ----------- | ----- | ---------------- | ------------------------------------ |
+  | date        | 日期  | 120              | 直接显示                             |
+  | —           | 时间  | 140              | formatter 拼接 `startTime ~ endTime` |
+  | courseName  | 课程  | — (minWidth 180) | 直接显示                             |
+  | teacherName | 教师  | 110              | 直接显示                             |
+  | studentName | 学员  | 110              | 直接显示                             |
+  | classroom   | 教室  | 100              | 直接显示                             |
+  | status      | 状态  | 100              | slot + StatusBadge                   |
 - **状态映射**（statusMapping）：`scheduled → 已排课(success)` / `finished → 已完成(info)` / `cancelled → 已取消(danger)`
 - **交互**：日期范围切换后自动查询；轻量只读，不做日历拖拽
 - **AutoImport 边界**（遵循既有约定）：`ref / reactive / onMounted` 自动导入；`ElMessage`、`courseService`、类型、`dayjs`、`StatusBadge`、`TableColumn` 类型需显式 import
 
 **伪代码骨架**：
+
 ```vue
 <script setup lang="ts">
 import dayjs from 'dayjs'
@@ -92,7 +114,9 @@ onMounted(fetch)
 ### 阶段 H：项目文档
 
 #### H1：README.md（重写）
+
 **受众**：新加入项目的开发者。**内容大纲**：
+
 1. 项目简介（伴学老师后台管理系统定位）
 2. 技术栈（Vue 3.4 / TS 5 / Vite 5 / Pinia 2 / Vue Router 4 / Element Plus 2.8 / ECharts 5.5 / MSW v2 / Axios）
 3. 环境要求（Node ≥ 18）
@@ -105,7 +129,9 @@ onMounted(fetch)
 10. 浏览器兼容性
 
 #### H2：docs/architecture.md
+
 **内容**：
+
 1. 分层架构图：View → Composable → Service → API →（Axios 封装）→ Mock/后端
 2. 目录结构详解（src/ 下各目录职责）
 3. 三层组件模型：UI库(El) → Base → Business，全局注册机制 + global-components.d.ts 桩
@@ -115,7 +141,9 @@ onMounted(fetch)
 7. Mock 体系：MSW v2 worker + handlers + db
 
 #### H3：docs/conventions.md
+
 **内容**：
+
 1. 命名规范：文件 kebab-case、组件 PascalCase、composable useXxx、store useXxxStore
 2. 目录组织：feature-based，业务模块集中在 views/
 3. TypeScript：strict 模式、type-first（API 层定义 Req/Resp 接口）、避免 any
@@ -128,7 +156,9 @@ onMounted(fetch)
 8. 代码检查：ESLint + Prettier + vue-tsc，husky + lint-staged
 
 #### H4：docs/permission.md
+
 **内容**：
+
 1. 权限模型：JWT + RBAC 三级
 2. 登录流程：login → token → fetchUserInfo（roles/permissions/dataScopes）→ generateRoutes
 3. 路由级权限：动态路由（buildRoutesFromMenus 过滤 permissions）+ guards 守卫
@@ -142,7 +172,9 @@ onMounted(fetch)
 8. 两个账号权限差异表（admin 全量 vs teacher 受限 6 个权限码）
 
 #### H5：docs/decision-log.md
+
 **内容**（记录关键架构决策与理由）：
+
 1. 为何选 MSW v2（vs mockjs）：Service Worker 拦截真实网络请求，不污染 axios，可平滑切换后端
 2. 为何 Element Plus 全量注册（vs 按需）：后台系统组件密度高，全量注册开发效率优先，unplugin-vue-components 补充类型
 3. 为何 AutoImport 仅覆盖 vue/router/pinia/@vueuse：避免过度隐式导入降低可读性，ElMessage/组件/类型保持显式
@@ -169,15 +201,15 @@ onMounted(fetch)
 
 ## 四、Assumptions & Decisions 假设与决策
 
-| # | 决策 | 理由 |
-|---|------|------|
-| 1 | schedule 视图用 `BaseTable` 而非裸 `el-table` | 与系统其他列表视图保持一致，复用 loading/字典/slot 能力 |
-| 2 | schedule 不用 `useTable`/`BasePagination` | `getSchedule` 返回数组非分页，强套 useTable 反而别扭 |
-| 3 | 默认日期范围取「本周」 | 自然覆盖 mock 数据日期（07-02/07-03 在本周），且符合真实业务直觉 |
-| 4 | schedule 为只读列表 | 计划明确「不强制做日历拖拽」，保持轻量；增删排课 API 已存在但本轮不接 UI |
-| 5 | 文档语言为中文 | 用户沟通语言为中文，团队为中文团队 |
-| 6 | 不再调用 NotifyUser 二次确认 | 计划批准后直接执行，遵循 system-reminder 约束 |
-| 7 | 验证以 type-check/build/lint:check 三步为准 | dev 冒烟为可选，环境受限时不阻塞收尾 |
+| #   | 决策                                          | 理由                                                                     |
+| --- | --------------------------------------------- | ------------------------------------------------------------------------ |
+| 1   | schedule 视图用 `BaseTable` 而非裸 `el-table` | 与系统其他列表视图保持一致，复用 loading/字典/slot 能力                  |
+| 2   | schedule 不用 `useTable`/`BasePagination`     | `getSchedule` 返回数组非分页，强套 useTable 反而别扭                     |
+| 3   | 默认日期范围取「本周」                        | 自然覆盖 mock 数据日期（07-02/07-03 在本周），且符合真实业务直觉         |
+| 4   | schedule 为只读列表                           | 计划明确「不强制做日历拖拽」，保持轻量；增删排课 API 已存在但本轮不接 UI |
+| 5   | 文档语言为中文                                | 用户沟通语言为中文，团队为中文团队                                       |
+| 6   | 不再调用 NotifyUser 二次确认                  | 计划批准后直接执行，遵循 system-reminder 约束                            |
+| 7   | 验证以 type-check/build/lint:check 三步为准   | dev 冒烟为可选，环境受限时不阻塞收尾                                     |
 
 ## 五、Verification 验证步骤
 
@@ -189,7 +221,8 @@ onMounted(fetch)
 
 ## 六、执行顺序
 
-1. 创建 `src/views/course/schedule/index.vue` → 标记 G 完成
-2. 创建 `README.md` + `docs/{architecture,conventions,permission,decision-log}.md` → 标记 H 完成
-3. 依次运行 type-check → build → lint:check → 标记 I 完成
-4. 返回最终响应（含验证结果摘要 + 账号信息 + 后续可演进方向）
+1. **阶段 0**：修正 `package.json` + `.eslintrc.cjs` 包名 → `npm install` → 标记阶段 0 完成
+2. **阶段 G4**：创建 `src/views/course/schedule/index.vue` → 标记 G 完成
+3. **阶段 H**：创建 `README.md` + `docs/{architecture,conventions,permission,decision-log}.md` → 标记 H 完成
+4. **阶段 I**：依次运行 type-check → build → lint:check → 标记 I 完成
+5. 返回最终响应（含验证结果摘要 + 账号信息 + 后续可演进方向）

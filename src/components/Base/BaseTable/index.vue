@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T extends Record<string, any>">
 import { computed } from 'vue'
 import { ElTable, ElTableColumn, ElButton } from 'element-plus'
 import { ElMessageBox } from 'element-plus'

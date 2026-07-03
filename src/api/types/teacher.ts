@@ -62,5 +62,16 @@ export interface AuditTeacherReq {
   remark?: string
 }
 
+/** 教师新增/编辑表单 */
+export interface TeacherForm {
+  id?: string
+  name: string
+  phone: string
+  gender: string
+  subject: string
+  email?: string
+  intro?: string
+}
+
 /** 教师列表响应 */
 export type TeacherListResp = PageResult<TeacherListItem>

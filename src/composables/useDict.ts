@@ -36,9 +36,14 @@ export function useDict(...codes: string[]) {
     return item?.label ?? String(value)
   }
 
-  function getTagType(code: string, value: string | number | undefined | null) {
-    if (value == null) return ''
-    return dictMap[code]?.find((i) => i.value === value)?.tagType ?? ''
+  function getTagType(
+    code: string,
+    value: string | number | undefined | null,
+  ): 'success' | 'warning' | 'danger' | 'info' | undefined {
+    if (value == null) return undefined
+    const tagType = dictMap[code]?.find((i) => i.value === value)?.tagType
+    if (!tagType) return undefined
+    return tagType as 'success' | 'warning' | 'danger' | 'info'
   }
 
   load()

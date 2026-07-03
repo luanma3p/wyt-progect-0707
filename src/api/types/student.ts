@@ -39,5 +39,29 @@ export interface AddFollowReq {
   content: string
 }
 
+/** 学员新增/编辑表单 */
+export interface StudentForm {
+  id?: string
+  name: string
+  phone: string
+  grade: string
+  teacherId: string
+  gender?: string
+  parentName?: string
+  parentPhone?: string
+  address?: string
+  remark?: string
+}
+
+/** 学员详情 */
+export interface StudentDetailResp extends StudentListItem {
+  gender?: string
+  parentName?: string
+  parentPhone?: string
+  address?: string
+  remark?: string
+  followRecords: StudentFollowRecord[]
+}
+
 /** 学员列表响应 */
 export type StudentListResp = PageResult<StudentListItem>
