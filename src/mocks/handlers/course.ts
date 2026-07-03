@@ -37,9 +37,9 @@ export const courseHandlers = [
     return HttpResponse.json(ok(null, '课程已创建'))
   }),
 
-  http.put(`${API_PREFIX}/course`, async ({ request }) => {
+  http.put(`${API_PREFIX}/course/:id`, async ({ request, params }) => {
     const body = (await request.json()) as CourseForm
-    const course = courses.find((c) => c.id === body.id)
+    const course = courses.find((c) => c.id === params.id)
     if (course) Object.assign(course, body)
     return HttpResponse.json(ok(null, '课程已更新'))
   }),

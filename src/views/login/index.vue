@@ -35,7 +35,11 @@ async function handleLogin() {
   }
   loading.value = true
   try {
-    await userStore.login({ username: form.username, password: form.password })
+    await userStore.login({
+      username: form.username,
+      password: form.password,
+      remember: form.remember,
+    })
     const redirect = (route.query.redirect as string) || '/'
     ElMessage.success('登录成功')
     router.replace(redirect)
